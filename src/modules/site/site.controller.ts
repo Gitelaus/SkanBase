@@ -76,4 +76,7 @@ export default class SiteController extends Controller {
         });
     }
 
+    scanSite = () => {
+        
+    }
 }

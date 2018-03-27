@@ -18,6 +18,8 @@ const DB_URL = `${DB_HOST}:${DB_PORT}`;
 const mongoClient = mongodb.MongoClient;
 
 
+// load global configuration.
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
@@ -50,7 +52,7 @@ app.use(bodyParser.json())
 // });
 
 // activate();
-loadModules().then(activate);
+loadModules().then(loadConfig).then(activate);
 
 function activate(){    
     // TODO: modulize this
@@ -58,8 +60,10 @@ function activate(){
 
     // Return list of sites.
     app.get("/site/", app.get('site-controller').getSites);
+    app.post("/site/", app.get('site-controller').insertSite);
 
-    app.post("/site", app.get('site-controller').insertSite);
+    // app.get("/scan/", app.get('scan-controller').getScans);
+    app.post("/scan/", app.get('scan-controller').insertScan);
 
     mongoClient.connect(DB_URL, (err, client) => {
         if(err){
@@ -93,5 +97,14 @@ function loadModules(){
 
             resolve();
         });
+    });
+}
+
+function loadConfig(){
+    return new Promise((resolve, reject) => {
+            fs.readdir(`${__dirname}/config.json`, function(err, config){
+                app.set('config', config);
+                resolve();
+            })
     });
 }
